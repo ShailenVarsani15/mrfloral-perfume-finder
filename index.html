@@ -8,9 +8,25 @@
 </head>
 <body>
     <h2 style="text-align: center; color: #333;">Mr Floral Perfume Finder</h2>
-    <div class="search-box">
-        <input type="text" id="findInput" placeholder="Search a fragrance note (like oud)" autocomplete="off">
+    
+    <div class="search-container">
+        <div class="field-group filter-field">
+            <label class="field-label" for="typeFilter">Filter by Product Type</label>
+            <select id="typeFilter" onchange="runSearch()">
+                <option value="all">All Types</option>
+                <option value="perfume">Perfumes</option>
+                <option value="candle">Candles</option>
+                <option value="handwash">Hand Washes</option>
+                <option value="hand cream">Hand Creams / Lotions</option>
+                <option value="bodywash">Body Washes</option>
+            </select>
+        </div>
+        <div class="field-group search-field">
+            <label class="field-label" for="findInput">Search by Fragrance Note, Name, or Brand</label>
+            <input type="text" id="findInput" placeholder="Type a fragrance note (like oud, rose, vanilla)..." autocomplete="off">
+        </div>
     </div>
+
     <div class="pills">
         <span class="pill" onclick="clickPill('rose')">Rose</span>
         <span class="pill" onclick="clickPill('vanilla')">Vanilla</span>
@@ -20,8 +36,18 @@
     </div>
     <div id="output"></div>
 
-    <script src="database.js"></script>
+    <script src="database-tobali.js"></script>
+    <script src="database-19-69.js"></script>
+    <script src="database-byredo.js"></script>
+    <script src="database-dorsay.js"></script>
     <script>
+        const database = [
+            ...database_tobali,
+            ...database_1969,
+            ...database_byredo,
+            ...database_dorsay
+        ];
+
         document.getElementById('findInput').onkeyup = function() {
             runSearch();
         };
@@ -33,16 +59,29 @@
 
         function runSearch() {
             const targetWord = document.getElementById('findInput').value.toLowerCase().trim();
+            const selectedType = document.getElementById('typeFilter').value;
             const outArea = document.getElementById('output');
             outArea.innerHTML = '';
 
-            if (targetWord === '') return;
+            let matches = database.filter(item => {
+                const matchesType = (selectedType === 'all' || item.type === selectedType);
+                
+                const notes = item.notes || [];
+                const name = item.name ? item.name.toLowerCase() : '';
+                const brand = item.brand ? item.brand.toLowerCase() : '';
 
-            const matches = database.filter(item => {
-                const noteFound = item.notes.some(n => n.includes(targetWord) || targetWord.includes(n));
-                const nameFound = item.name.toLowerCase().includes(targetWord);
-                const brandFound = item.brand.toLowerCase().includes(targetWord);
-                return noteFound || nameFound || brandFound;
+                const noteFound = notes.some(n => n.toLowerCase().includes(targetWord));
+                const nameFound = name.includes(targetWord);
+                const brandFound = brand.includes(targetWord);
+                const matchesText = targetWord === '' || noteFound || nameFound || brandFound;
+                
+                return matchesType && matchesText;
+            });
+
+            matches.sort((a, b) => {
+                const sizeA = a.size_value || 0;
+                const sizeB = b.size_value || 0;
+                return sizeB - sizeA; 
             });
 
             if (matches.length === 0) {
@@ -54,16 +93,17 @@
                 const element = document.createElement('div');
                 element.className = 'card';
                 
-                const tagsStr = item.notes.map(n => `<span class="tag">${n}</span>`).join('');
+                const notesArray = item.notes || [];
+                const tagsStr = notesArray.map(n => `<span class="tag">${n}</span>`).join('');
                 
                 element.innerHTML = `
                     <div class="img-box">
-                        <img src="${item.image}" alt="Preview" onerror="this.onerror=null; this.src='https://placehold.co/100x100?text=No+Image';">
+                        <img src="${item.image || ''}" alt="Preview" onerror="this.onerror=null; this.src='https://placehold.co/100x100?text=No+Image';">
                     </div>
                     <div class="info">
-                        <div class="brand">${item.brand}</div>
-                        <div class="title">${item.name}</div>
-                        <a class="link" href="${item.url}" target="_blank">View Listing &rarr;</a>
+                        <div class="brand">${item.brand || 'Unknown Brand'}</div>
+                        <div class="title">${item.name || 'Untitled'}</div>
+                        <a class="link" href="${item.url || '#'}" target="_blank">View Listing &rarr;</a>
                         <div>${tagsStr}</div>
                     </div>
                 `;

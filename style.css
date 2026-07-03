@@ -17,6 +17,44 @@ input[type="text"] {
     border-radius: 30px;
     outline: none;
 }
+/* Container to group search elements */
+.search-container {
+    display: flex;
+    gap: 15px;
+    max-width: 600px;
+    margin: 0 auto 15px auto;
+}
+/* Style for the wrappers to stack label above input */
+.field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.search-field {
+    flex: 2; /* Search input gets more space */
+}
+.filter-field {
+    flex: 1; /* Dropdown gets less space */
+}
+/* Style for labels */
+.field-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #555;
+    text-align: left;
+}
+.search-field input, .filter-field select {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+.filter-field select {
+    cursor: pointer;
+    background-color: #fff;
+}
 .pills {
     text-align: center;
     margin-bottom: 30px;
