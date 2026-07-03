@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Mr Floral Perfume Search</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h2 style="text-align: center; color: #333;">Mr Floral Perfume Finder</h2>
+    <div class="search-box">
+        <input type="text" id="findInput" placeholder="Search a fragrance note (like oud)" autocomplete="off">
+    </div>
+    <div class="pills">
+        <span class="pill" onclick="clickPill('rose')">Rose</span>
+        <span class="pill" onclick="clickPill('vanilla')">Vanilla</span>
+        <span class="pill" onclick="clickPill('saffron')">Saffron</span>
+        <span class="pill" onclick="clickPill('cannabis')">Cannabis</span>
+        <span class="pill" onclick="clickPill('aldehyd')">Aldehydes</span>
+    </div>
+    <div id="output"></div>
+
+    <script src="database.js"></script>
+    <script>
+        document.getElementById('findInput').onkeyup = function() {
+            runSearch();
+        };
+
+        function clickPill(val) {
+            document.getElementById('findInput').value = val;
+            runSearch();
+        }
+
+        function runSearch() {
+            const targetWord = document.getElementById('findInput').value.toLowerCase().trim();
+            const outArea = document.getElementById('output');
+            outArea.innerHTML = '';
+
+            if (targetWord === '') return;
+
+            const matches = database.filter(item => {
+                const noteFound = item.notes.some(n => n.includes(targetWord) || targetWord.includes(n));
+                const nameFound = item.name.toLowerCase().includes(targetWord);
+                const brandFound = item.brand.toLowerCase().includes(targetWord);
+                return noteFound || nameFound || brandFound;
+            });
+
+            if (matches.length === 0) {
+                outArea.innerHTML = '<p style="text-align:center; color:#999;">No results found.</p>';
+                return;
+            }
+
+            matches.forEach(item => {
+                const element = document.createElement('div');
+                element.className = 'card';
+                
+                const tagsStr = item.notes.map(n => `<span class="tag">${n}</span>`).join('');
+                
+                element.innerHTML = `
+                    <div class="img-box">
+                        <img src="${item.image}" alt="Preview" onerror="this.onerror=null; this.src='https://placehold.co/100x100?text=No+Image';">
+                    </div>
+                    <div class="info">
+                        <div class="brand">${item.brand}</div>
+                        <div class="title">${item.name}</div>
+                        <a class="link" href="${item.url}" target="_blank">View Listing &rarr;</a>
+                        <div>${tagsStr}</div>
+                    </div>
+                `;
+                outArea.appendChild(element);
+            });
+        }
+    </script>
+</body>
+</html>
