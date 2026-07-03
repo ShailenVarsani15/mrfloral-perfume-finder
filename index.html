@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h2 style="text-align: center; color: #333;">Mr Floral Perfume Finder</h2>
+    <h2 style="text-align: center; color: #333;">Find your scent at Mr Floral</h2>
     
     <div class="search-container">
         <div class="field-group filter-field">
@@ -22,12 +22,13 @@
             </select>
         </div>
         <div class="field-group search-field">
-            <label class="field-label" for="findInput">Search by Fragrance Note, Name, or Brand</label>
-            <input type="text" id="findInput" placeholder="Type a fragrance note (like oud, rose, vanilla)..." autocomplete="off">
+            <label class="field-label" for="findInput">Search by Fragrance Notes, Name, or Brand</label>
+            <input type="text" id="findInput" placeholder="Type multiple notes (like: rose, oud)..." autocomplete="on">
         </div>
     </div>
 
     <div class="pills">
+        <p class="pill-label">Popular scents</p>
         <span class="pill" onclick="clickPill('rose')">Rose</span>
         <span class="pill" onclick="clickPill('vanilla')">Vanilla</span>
         <span class="pill" onclick="clickPill('saffron')">Saffron</span>
@@ -53,27 +54,40 @@
         };
 
         function clickPill(val) {
-            document.getElementById('findInput').value = val;
+            const currentVal = document.getElementById('findInput').value.trim();
+            if (currentVal === '') {
+                document.getElementById('findInput').value = val;
+            } else {
+                const existingKeywords = currentVal.split(',').map(k => k.trim().toLowerCase());
+                if (!existingKeywords.includes(val.toLowerCase())) {
+                    document.getElementById('findInput').value = currentVal + ", " + val;
+                }
+            }
             runSearch();
         }
 
         function runSearch() {
-            const targetWord = document.getElementById('findInput').value.toLowerCase().trim();
+            const searchInput = document.getElementById('findInput').value.toLowerCase();
+            const keywords = searchInput.split(',').map(k => k.trim()).filter(k => k !== '');
             const selectedType = document.getElementById('typeFilter').value;
             const outArea = document.getElementById('output');
             outArea.innerHTML = '';
 
             let matches = database.filter(item => {
                 const matchesType = (selectedType === 'all' || item.type === selectedType);
+                if (keywords.length === 0) return matchesType;
                 
                 const notes = item.notes || [];
                 const name = item.name ? item.name.toLowerCase() : '';
                 const brand = item.brand ? item.brand.toLowerCase() : '';
 
-                const noteFound = notes.some(n => n.toLowerCase().includes(targetWord));
-                const nameFound = name.includes(targetWord);
-                const brandFound = brand.includes(targetWord);
-                const matchesText = targetWord === '' || noteFound || nameFound || brandFound;
+                // Every single keyword in the search box must return true for this item
+                const matchesText = keywords.every(keyword => {
+                    const noteFound = notes.some(n => n.toLowerCase().includes(keyword));
+                    const nameFound = name.includes(keyword);
+                    const brandFound = brand.includes(keyword);
+                    return noteFound || nameFound || brandFound;
+                });
                 
                 return matchesType && matchesText;
             });
@@ -85,7 +99,7 @@
             });
 
             if (matches.length === 0) {
-                outArea.innerHTML = '<p style="text-align:center; color:#999;">No results found.</p>';
+                outArea.innerHTML = '<p style="text-align:center; color:#999;">No results found match all criteria.</p>';
                 return;
             }
 
@@ -103,8 +117,8 @@
                     <div class="info">
                         <div class="brand">${item.brand || 'Unknown Brand'}</div>
                         <div class="title">${item.name || 'Untitled'}</div>
-                        <a class="link" href="${item.url || '#'}" target="_blank">View Listing &rarr;</a>
-                        <div>${tagsStr}</div>
+                        <div class="tags-container">${tagsStr}</div>
+                        <a class="shop-now-btn" href="${item.url || '#'}" target="_blank">SHOP NOW</a>
                     </div>
                 `;
                 outArea.appendChild(element);
