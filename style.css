@@ -16,33 +16,31 @@ input[type="text"] {
     border-radius: 30px;
     outline: none;
 }
-/* Container to group search elements */
 .search-container {
     display: flex;
     gap: 15px;
     max-width: 600px;
     margin: 0 auto 15px auto;
 }
-/* Style for the wrappers to stack label above input */
 .field-group {
     display: flex;
     flex-direction: column;
     gap: 5px;
 }
 .search-field {
-    flex: 2; /* Search input gets more space */
+    flex: 2;
 }
 .filter-field {
-    flex: 1; /* Dropdown gets less space */
+    flex: 1;
 }
-/* Style for labels */
 .field-label {
     font-size: 14px;
     font-weight: normal;
     color: #454545;
     text-align: left;
 }
-.search-field input, .filter-field select {
+.search-field input, 
+.filter-field select {
     width: 100%;
     padding: 10px;
     font-size: 16px;
@@ -64,64 +62,66 @@ input[type="text"] {
 }
 .pill {
     display: inline-block;
-    background: #1a1a1a;
-    color: #fff;
+    background: #f5f5f5;
+    color: #1a1a1a;
     padding: 8px 16px;
     margin: 5px;
     border-radius: 20px;
     cursor: pointer;
     font-size: 14px;
+    transition: all 0.25s ease;
+    user-select: none;
 }
-/* Container holding all the results */
+.pill:hover {
+    background: #eaeaea;
+    border-color: #cccccc;
+    color: #1a1a1a;
+}
+.pill.active {
+    background: #000000;
+    color: #ffffff;
+    border-color: #000000;
+}
 #output {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 equal tiles per row on desktop */
+    grid-template-columns: repeat(3, 1fr);
     gap: 25px;
     max-width: 1200px;
     margin: 30px auto;
     padding: 0 15px;
     box-sizing: border-box;
 }
-
-/* Individual Vertical Card Layout */
 .card {
     display: flex;
-    flex-direction: column; /* Stack elements vertically */
+    flex-direction: column;
     background: #ffffff;
     border: 1px solid #eaeaea;
     border-radius: 2px;
     padding: 20px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
     box-sizing: border-box;
-    height: 100%; /* Ensures all cards match heights evenly */
+    height: 100%;
 }
-
-/* 1. Image fills the top section */
 .img-box {
     width: 100%;
     height: auto;
-    aspect-ratio: 1 / 1; /* Maintains a perfect square box */
+    aspect-ratio: 1 / 1;
     margin-bottom: 20px;
     overflow: hidden;
     border-radius: 2px;
     flex-shrink: 0;
 }
-
 .img-box img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
-
-/* Info container handles structural vertical spacing */
 .info {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    flex-grow: 1; /* Pushes the button to the absolute bottom */
+    flex-grow: 1;
 }
-
-/* 2. Brand name */
 .brand {
     font-size: 11px;
     font-weight: bold;
@@ -130,8 +130,6 @@ input[type="text"] {
     letter-spacing: 1px;
     margin-bottom: 6px;
 }
-
-/* 3. Title on its own line */
 .title {
     font-size: 15px;
     font-weight: normal;
@@ -140,34 +138,37 @@ input[type="text"] {
     text-align: left;
     line-height: 1.3;
 }
-
-/* 4. Tags run inline and wrap seamlessly */
+/* Explicitly style the tag container to wrap lines seamlessly */
 .tags-container {
     display: flex;
-    flex-wrap: wrap; /* Keeps them flowing without making the card crazy long */
-    gap: 6px;
-    margin-bottom: 24px;
+    flex-wrap: wrap; /* Aligns tags nicely onto new lines inside the card boundary */
+    width: 100%;
+    margin-bottom: 14px;
 }
 
-.tag {
+/* Base card tag styles (Resting state) */
+.tags-container .tag {
     background: #f5f5f5;
-    color: #454545;
+    color: #444444;
     padding: 4px 12px;
+    margin: 4px 4px 4px 0; /* Adjusted margins so they don't push outside boundaries */
     border-radius: 1px;
     font-size: 13px;
     white-space: nowrap;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
 }
-
-/* 5. Button fills the entire card width */
+.tag.active {
+    background: #1a1a1a;
+    color: #fff;
+}
 .shop-now-btn {
     display: block;
-    width: 100%; /* Fills the container width with internal padding safety */
+    width: 100%;
     text-align: center;
-    padding: 15px 0; /* Vertical sizing comfort */
-    margin-top: auto; /* Forces button down to align nicely on uneven cards */
+    padding: 15px 0;
+    margin-top: auto;
 }
-
-/* Responsive: 1 tile per row on mobile screens */
 @media (max-width: 900px) {
     #output {
         grid-template-columns: 1fr;
@@ -186,23 +187,15 @@ input[type="text"] {
     text-decoration: none;
     text-transform: uppercase;
     box-sizing: border-box;
-    
-    /* Base styles */
     border: 1px solid #000000;
     background-color: #000000;
     color: #ffffff;
-    
-    /* Setup for the pseudo-element layering */
     position: relative;
     z-index: 1;
     overflow: hidden;
     cursor: pointer;
-
-    /* Applied your custom easing curves here */
     transition: color .45s cubic-bezier(.785,.135,.15,.86), border .45s cubic-bezier(.785,.135,.15,.86);
 }
-
-/* The sliding white background layer */
 .shop-now-btn::before {
     content: "";
     position: absolute;
@@ -212,28 +205,17 @@ input[type="text"] {
     height: 100%;
     background-color: #ffffff;
     z-index: -1;
-    
-    /* Start completely shrunk to the left side */
     transform: scaleX(0);
     transform-origin: left center;
-    
-    /* Synchronized the background slide to use your exact curve as well */
     transition: transform .45s cubic-bezier(.785,.135,.15,.86), transform-origin 0s;
 }
-
-/* Hover State */
 .shop-now-btn:hover {
     color: #000000;
 }
-
 .shop-now-btn:hover::before {
-    /* Grow to full width from the left side */
     transform: scaleX(1);
 }
-
-/* Mouse Leave State */
 .shop-now-btn:not(:hover)::before {
-    /* Force it to shrink toward the RIGHT side */
     transform-origin: right center;
     transform: scaleX(0);
 }

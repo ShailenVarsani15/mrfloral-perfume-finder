@@ -32,8 +32,8 @@
         <span class="pill" onclick="clickPill('rose')">Rose</span>
         <span class="pill" onclick="clickPill('vanilla')">Vanilla</span>
         <span class="pill" onclick="clickPill('saffron')">Saffron</span>
-        <span class="pill" onclick="clickPill('cannabis')">Cannabis</span>
-        <span class="pill" onclick="clickPill('aldehyd')">Aldehydes</span>
+        <span class="pill" onclick="clickPill('Cedarwood')">Cedarwood</span>
+        <span class="pill" onclick="clickPill('tonka bean')">Tonka Bean</span>
     </div>
     <div id="output"></div>
 
@@ -54,13 +54,25 @@
         };
 
         function clickPill(val) {
-            const currentVal = document.getElementById('findInput').value.trim();
+            const inputEl = document.getElementById('findInput');
+            const currentVal = inputEl.value.trim();
+            
             if (currentVal === '') {
-                document.getElementById('findInput').value = val;
+                inputEl.value = val;
             } else {
+                // Split current input into an array of lowercase keywords
                 const existingKeywords = currentVal.split(',').map(k => k.trim().toLowerCase());
-                if (!existingKeywords.includes(val.toLowerCase())) {
-                    document.getElementById('findInput').value = currentVal + ", " + val;
+                const targetPill = val.toLowerCase();
+                
+                if (existingKeywords.includes(targetPill)) {
+                    // SELECTION REVERSAL: If the pill is already active, remove it from the input on click!
+                    const updatedKeywords = currentVal.split(',')
+                        .map(k => k.trim())
+                        .filter(k => k.toLowerCase() !== targetPill);
+                    inputEl.value = updatedKeywords.join(', ');
+                } else {
+                    // Append the new pill keyword with a comma
+                    inputEl.value = currentVal + ", " + val;
                 }
             }
             runSearch();
@@ -73,6 +85,28 @@
             const outArea = document.getElementById('output');
             outArea.innerHTML = '';
 
+            // --- PILL STATE SYNC ENGINE ---
+            // Loop through every DOM element with the class "pill"
+            const allPills = document.querySelectorAll('.pill');
+            allPills.forEach(pill => {
+                // Get the unique note text for this pill (e.g., 'rose' or 'vanilla')
+                // We extract it from the onclick attribute string: clickPill('rose') -> rose
+                const pillAttribute = pill.getAttribute('onclick');
+                const pillValueMatch = pillAttribute.match(/'([^']+)'/);
+                
+                if (pillValueMatch) {
+                    const pillNote = pillValueMatch[1].toLowerCase();
+                    
+                    // If this pill's exact note is present in the search keywords array, light it up!
+                    if (keywords.includes(pillNote)) {
+                        pill.classList.add('active');
+                    } else {
+                        pill.classList.remove('active');
+                    }
+                }
+            });
+            // ------------------------------
+
             let matches = database.filter(item => {
                 const matchesType = (selectedType === 'all' || item.type === selectedType);
                 if (keywords.length === 0) return matchesType;
@@ -81,7 +115,6 @@
                 const name = item.name ? item.name.toLowerCase() : '';
                 const brand = item.brand ? item.brand.toLowerCase() : '';
 
-                // Every single keyword in the search box must return true for this item
                 const matchesText = keywords.every(keyword => {
                     const noteFound = notes.some(n => n.toLowerCase().includes(keyword));
                     const nameFound = name.includes(keyword);
@@ -108,7 +141,13 @@
                 element.className = 'card';
                 
                 const notesArray = item.notes || [];
-                const tagsStr = notesArray.map(n => `<span class="tag">${n}</span>`).join('');
+                
+                // Loops through notes and adds 'active' class ONLY if it matches a search keyword
+                const tagsStr = notesArray.map(n => {
+                    const isMatched = keywords.some(keyword => n.toLowerCase().includes(keyword));
+                    const activeClass = isMatched ? 'active' : '';
+                    return `<span class="tag ${activeClass}">${n}</span>`;
+                }).join('');
                 
                 element.innerHTML = `
                     <div class="img-box">
