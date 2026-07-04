@@ -1,5 +1,5 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     margin: 30px auto;
     padding: 0 20px;
     background: #fdfdfd;
@@ -19,8 +19,40 @@ input[type="text"] {
 .search-container {
     display: flex;
     gap: 15px;
-    max-width: 600px;
-    margin: 0 auto 15px auto;
+    width: 100%;          /* Always spans 100% width for edge-to-edge tracking background/shadow */
+    box-sizing: border-box;
+    position: sticky;
+    top: -1px;            
+    z-index: 100;
+    background: #fdfdfd;  
+    padding: 15px 20px;   
+    
+    /* Smooth transitions for all properties shifting when stuck */
+    transition: box-shadow 0.35s ease, padding 0.35s ease, background-color 0.35s ease;
+}
+
+/* Inner structural wrapper */
+.search-container-inner {
+    display: flex;
+    gap: 15px;
+    width: 100%;
+    max-width: 600px;     /* Default max width when resting inline on the page */
+    margin: 0 auto;       
+    
+    /* Smooth width expansion transition */
+    transition: max-width 0.35s cubic-bezier(.785,.135,.15,.86);
+}
+
+/* --- ACTIVE STICKY CHANGES --- */
+
+.search-container.is-sticky {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); 
+    padding: 12px 30px; /* Slight horizontal padding adjust for wide edge-to-edge styling */
+}
+
+/* When parent is sticky, scale the inner components to 100% width across the viewport */
+.search-container.is-sticky .search-container-inner {
+    max-width: 100%;    /* Overrides the 600px limit to fill the viewport edge-to-edge */
 }
 .field-group {
     display: flex;
@@ -55,6 +87,7 @@ input[type="text"] {
 .pill-label {
     margin: 0;
     margin-bottom: 3px;
+    font-size: 14px;
 }
 .pills {
     text-align: center;
@@ -140,17 +173,15 @@ input[type="text"] {
 }
 .tags-container {
     display: flex;
-    flex-wrap: wrap; /* Aligns tags nicely onto new lines inside the card boundary */
+    flex-wrap: wrap;
     width: 100%;
     margin-bottom: 14px;
 }
-
-/* Base card tag styles (Resting state) */
 .tags-container .tag {
     background: #f5f5f5;
     color: #444444;
     padding: 4px 12px;
-    margin: 4px 4px 4px 0; /* Adjusted margins so they don't push outside boundaries */
+    margin: 4px 4px 4px 0;
     border-radius: 1px;
     font-size: 13px;
     white-space: nowrap;

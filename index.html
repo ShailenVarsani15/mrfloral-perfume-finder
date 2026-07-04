@@ -10,25 +10,27 @@
     <h2 style="text-align: center; color: #333;">Find your scent at Mr Floral</h2>
     
     <div class="search-container">
-        <div class="field-group filter-field">
-            <label class="field-label" for="typeFilter">Filter by Product Type</label>
-            <select id="typeFilter" onchange="runSearch()">
-                <option value="all">All Types</option>
-                <option value="perfume">Perfumes</option>
-                <option value="candle">Candles</option>
-                <option value="handwash">Hand Washes</option>
-                <option value="hand cream">Hand Creams / Lotions</option>
-                <option value="bodywash">Body Washes</option>
-            </select>
-        </div>
-        <div class="field-group search-field">
-            <label class="field-label" for="findInput">Search by Fragrance Notes, Name, or Brand</label>
-            <input type="text" id="findInput" placeholder="Type multiple notes (like: rose, oud)..." autocomplete="on">
+        <div class="search-container-inner">
+            <div class="field-group filter-field">
+                <label class="field-label" for="typeFilter">Filter by Product Type</label>
+                <select id="typeFilter" onchange="runSearch()">
+                    <option value="all">All Types</option>
+                    <option value="perfume">Perfumes</option>
+                    <option value="candle">Candles</option>
+                    <option value="handwash">Hand Washes</option>
+                    <option value="hand cream">Hand Creams / Lotions</option>
+                    <option value="bodywash">Body Washes</option>
+                </select>
+            </div>
+            <div class="field-group search-field">
+                <label class="field-label" for="findInput">Search by Fragrance Notes, Name, or Brand</label>
+                <input type="text" id="findInput" placeholder="e.g. rose, vanilla (separated by commas)" autocomplete="on">
+            </div>
         </div>
     </div>
 
     <div class="pills">
-        <p class="pill-label">Popular scents</p>
+        <p class="pill-label">Popular search terms</p>
         <span class="pill" onclick="clickPill('rose')">Rose</span>
         <span class="pill" onclick="clickPill('vanilla')">Vanilla</span>
         <span class="pill" onclick="clickPill('saffron')">Saffron</span>
@@ -163,6 +165,22 @@
                 outArea.appendChild(element);
             });
         }
+
+        // Dynamic Sticky Tracker Engine
+        const headerEl = document.querySelector('.search-container');
+        
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                // If the element is not intersecting with the top of the viewport frame, it means it is stuck!
+                headerEl.classList.toggle('is-sticky', entry.intersectionRatio < 1);
+            },
+            { 
+                threshold: [1],
+                rootMargin: '-1px 0px 0px 0px' // Offset logic to track the -1px stick ceiling trigger
+            }
+        );
+
+        observer.observe(headerEl);
     </script>
 </body>
 </html>
